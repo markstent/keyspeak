@@ -1,5 +1,8 @@
 use anyhow::Result;
+use std::sync::OnceLock;
 use whisper_rs::{FullParams, SamplingStrategy, WhisperContext, WhisperContextParameters};
+
+static WHISPER_CTX: OnceLock<WhisperContext> = OnceLock::new();
 
 pub fn transcribe(samples: &[f32], model_path: &str, language: &str) -> Result<String> {
     // Too short to contain real speech
@@ -7,15 +10,16 @@ pub fn transcribe(samples: &[f32], model_path: &str, language: &str) -> Result<S
         return Ok(String::new());
     }
 
-    let ctx = WhisperContext::new_with_params(model_path, WhisperContextParameters::default())
-        .map_err(|e| {
-            anyhow::anyhow!(
-                "Could not load Whisper model at '{}'.\n\
-         Make sure you ran the model download command.\nError: {:?}",
-                model_path,
-                e
-            )
-        })?;
+    let ctx = WHISPER_CTX.get_or_init(|| {
+        WhisperContext::new_with_params(model_path, WhisperContextParameters::default())
+            .unwrap_or_else(|e| {
+                panic!(
+                    "Could not load Whisper model at '{}'.\n\
+             Make sure you ran the model download command.\nError: {:?}",
+                    model_path, e
+                )
+            })
+    });
 
     let mut state = ctx
         .create_state()
@@ -43,5 +47,68 @@ pub fn transcribe(samples: &[f32], model_path: &str, language: &str) -> Result<S
             text.push_str(&seg);
         }
     }
-    Ok(text.trim().to_string())
+    let cleaned = strip_noise_artifacts(text.trim());
+    Ok(cleaned)
+}
+
+/// Remove non-speech artifacts that Whisper hallucinates from silence or background noise.
+/// Strips bracketed/parenthesized annotations like [crickets chirping], (background noise),
+/// *music playing*, and common silence hallucinations.
+fn strip_noise_artifacts(text: &str) -> String {
+    let mut result = String::with_capacity(text.len());
+    let mut chars = text.chars().peekable();
+
+    while let Some(&ch) = chars.peek() {
+        match ch {
+            '[' => skip_until(&mut chars, ']'),
+            '(' => skip_until(&mut chars, ')'),
+            '*' => {
+                // Only skip *starred phrases* (annotations), not single asterisks
+                chars.next();
+                let rest: String = chars.clone().collect();
+                if let Some(end) = rest.find('*') {
+                    for _ in 0..=end {
+                        chars.next();
+                    }
+                } else {
+                    result.push('*');
+                }
+            }
+            _ => {
+                result.push(ch);
+                chars.next();
+            }
+        }
+    }
+
+    let result = result.trim().to_string();
+
+    // Common Whisper silence hallucinations (exact matches after stripping)
+    const NOISE_PHRASES: &[&str] = &[
+        "thank you",
+        "thanks for watching",
+        "you",
+        "bye",
+        "goodbye",
+        "the end",
+        "...",
+        "subtitles by the amara.org community",
+    ];
+
+    let lower = result.to_lowercase();
+    let trimmed = lower.trim_matches(|c: char| c == '.' || c == '!' || c == ' ');
+    if NOISE_PHRASES.contains(&trimmed) {
+        return String::new();
+    }
+
+    result
+}
+
+fn skip_until(chars: &mut std::iter::Peekable<std::str::Chars>, closing: char) {
+    chars.next(); // consume opening bracket
+    for ch in chars.by_ref() {
+        if ch == closing {
+            break;
+        }
+    }
 }

@@ -13,9 +13,13 @@ rm -rf dist/
 mkdir -p "${APP_DIR}/Contents/MacOS"
 mkdir -p "${APP_DIR}/Contents/Resources"
 
-cp "target/release/keyspeak"   "${APP_DIR}/Contents/MacOS/KeySpeak"
+cp "target/release/keyspeak"          "${APP_DIR}/Contents/MacOS/keyspeak"
+cp "target/release/keyspeak-settings" "${APP_DIR}/Contents/MacOS/keyspeak-settings"
 cp "build/macos/Info.plist"    "${APP_DIR}/Contents/Info.plist"
 sed -i '' "s/1\.0\.0/${VERSION}/g" "${APP_DIR}/Contents/Info.plist"
+
+ICON_SRC="../images/KeySpeak.icns"
+cp "${ICON_SRC}" "${APP_DIR}/Contents/Resources/AppIcon.icns"
 
 echo "▶ Creating DMG..."
 hdiutil create \
@@ -25,6 +29,8 @@ hdiutil create \
 
 MOUNT=$(hdiutil attach "dist/rw.dmg" | tail -1 | awk '{print $NF}')
 ln -s /Applications "${MOUNT}/Applications"
+cp "${ICON_SRC}" "${MOUNT}/.VolumeIcon.icns"
+SetFile -a C "${MOUNT}"
 hdiutil detach "${MOUNT}"
 hdiutil convert "dist/rw.dmg" -format UDZO -o "${DMG_OUT}"
 rm "dist/rw.dmg"

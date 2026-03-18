@@ -14,5 +14,6 @@
   <key>NSMicrophoneUsageDescription</key>
   <string>KeySpeak records your voice to transcribe speech to text.
 Audio is processed entirely on your Mac and never transmitted anywhere.</string>
+  <key>CFBundleIconFile</key>         <string>AppIcon</string>
   <key>NSHighResolutionCapable</key>  <true/>
 </dict></plist>

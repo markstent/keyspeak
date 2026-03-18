@@ -2,7 +2,6 @@ use anyhow::{anyhow, Result};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::Sample;
 use crossbeam_channel::Sender;
-use rubato::{FftFixedInOut, Resampler};
 
 pub const WHISPER_SAMPLE_RATE: u32 = 16_000;
 
@@ -74,42 +73,28 @@ where
 }
 
 /// Resample audio from the device rate to 16 kHz (required by Whisper).
+/// Uses linear interpolation - sufficient quality for speech-to-text.
 pub fn resample_to_16k(samples: Vec<f32>, from_rate: u32) -> Vec<f32> {
     if from_rate == WHISPER_SAMPLE_RATE || samples.is_empty() {
         return samples;
     }
 
-    let chunk = 1024.min(samples.len());
-    let mut r =
-        match FftFixedInOut::<f32>::new(from_rate as usize, WHISPER_SAMPLE_RATE as usize, chunk, 1)
-        {
-            Ok(r) => r,
-            Err(e) => {
-                log::error!("Resampler init: {}", e);
-                return samples;
-            }
+    let ratio = from_rate as f64 / WHISPER_SAMPLE_RATE as f64;
+    let out_len = (samples.len() as f64 / ratio) as usize;
+    let mut out = Vec::with_capacity(out_len);
+
+    for i in 0..out_len {
+        let src_pos = i as f64 * ratio;
+        let idx = src_pos as usize;
+        let frac = (src_pos - idx as f64) as f32;
+
+        let sample = if idx + 1 < samples.len() {
+            samples[idx] * (1.0 - frac) + samples[idx + 1] * frac
+        } else {
+            samples[idx.min(samples.len() - 1)]
         };
-
-    let ratio = WHISPER_SAMPLE_RATE as f64 / from_rate as f64;
-    let mut out = Vec::with_capacity((samples.len() as f64 * ratio) as usize + 64);
-    let mut pos = 0;
-
-    while pos + chunk <= samples.len() {
-        if let Ok(res) = r.process(&[&samples[pos..pos + chunk]], None) {
-            out.extend_from_slice(&res[0]);
-        }
-        pos += chunk;
+        out.push(sample);
     }
 
-    // Handle the remaining samples (pad to fill last chunk)
-    if pos < samples.len() {
-        let real = samples.len() - pos;
-        let mut tail = samples[pos..].to_vec();
-        tail.resize(chunk, 0.0);
-        if let Ok(res) = r.process(&[&tail], None) {
-            let take = (real as f64 * ratio) as usize;
-            out.extend_from_slice(&res[0][..take.min(res[0].len())]);
-        }
-    }
     out
 }
