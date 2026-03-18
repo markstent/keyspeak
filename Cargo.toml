@@ -1,0 +1,48 @@
+[package]
+name        = "keyspeak"
+version     = "1.0.0"
+edition     = "2021"
+description = "Local speech-to-text for macOS — press a key, speak, text appears"
+license     = "MIT"
+repository  = "https://github.com/markstent/keyspeak"
+homepage    = "https://keyspeak.app"
+readme      = "README.md"
+keywords    = ["speech-to-text","whisper","macos","dictation","menubar"]
+categories  = ["accessibility","multimedia::audio"]
+exclude     = ["assets/","site/",".github/","scripts/"]
+
+[lib]
+name = "keyspeak"
+path = "src/lib.rs"
+
+[[bin]]
+name = "keyspeak"
+path = "src/main.rs"
+
+[profile.release]
+opt-level     = 3
+lto           = true
+codegen-units = 1
+strip         = true
+panic         = "abort"
+
+[dependencies]
+cpal              = "0.15"
+rubato            = "0.15"
+whisper-rs        = { version = "0.13", features = ["metal"] }
+global-hotkey     = "0.6"
+tray-icon         = "0.17"
+enigo             = "0.2"
+eframe            = { version = "0.27", features = ["default"] }
+egui              = "0.27"
+winit             = "0.29"
+crossbeam-channel = "0.5"
+serde             = { version = "1", features = ["derive"] }
+serde_json        = "1"
+dirs              = "5"
+anyhow            = "1"
+log               = "0.4"
+env_logger        = "0.11"
+
+[dev-dependencies]
+serde_json = "1"

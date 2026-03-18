@@ -1,0 +1,8 @@
+/target/
+dist/
+*.dmg
+*.app
+*.bin
+*.gguf
+.DS_Store
+._*
