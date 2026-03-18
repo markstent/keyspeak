@@ -2466,6 +2466,7 @@ dependencies = [
  "enigo",
  "env_logger",
  "global-hotkey",
+ "libc",
  "log",
  "serde",
  "serde_json",

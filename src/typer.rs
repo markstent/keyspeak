@@ -16,7 +16,9 @@ pub fn type_at_cursor(text: &str) -> Result<()> {
         )
     })?;
 
+    eprintln!("[typer] Typing {} chars into focused app...", text.len());
     e.text(text)
         .map_err(|e| anyhow::anyhow!("Typing failed: {:?}", e))?;
+    eprintln!("[typer] Done.");
     Ok(())
 }

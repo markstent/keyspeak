@@ -88,21 +88,34 @@ pub fn ensure_permissions() -> bool {
 
     // Check accessibility (will show macOS prompt if not granted)
     if !check_accessibility(true) {
-        eprintln!(
-            "[permissions] Accessibility access required. \
-             Please grant it in System Settings > Privacy & Security > Accessibility, \
-             then relaunch KeySpeak."
-        );
+        eprintln!();
+        eprintln!("===========================================================");
+        eprintln!("  KeySpeak needs Accessibility access to work.");
+        eprintln!();
+        eprintln!("  If you recently updated KeySpeak, the old permission is");
+        eprintln!("  stale. You must remove and re-add it:");
+        eprintln!();
+        eprintln!("  1. Open System Settings > Privacy & Security > Accessibility");
+        eprintln!("  2. Select KeySpeak and click the - button to REMOVE it");
+        eprintln!("  3. Click + and add KeySpeak.app from Applications");
+        eprintln!("  4. Make sure the toggle is ON");
+        eprintln!("  5. Quit and relaunch KeySpeak");
+        eprintln!("===========================================================");
+        eprintln!();
         all_ok = false;
     }
 
     // Check microphone (cpal triggers macOS prompt on first device access)
     if !check_microphone() {
-        eprintln!(
-            "[permissions] Microphone access required. \
-             Please grant it in System Settings > Privacy & Security > Microphone, \
-             then relaunch KeySpeak."
-        );
+        eprintln!();
+        eprintln!("===========================================================");
+        eprintln!("  KeySpeak needs Microphone access to record your voice.");
+        eprintln!();
+        eprintln!("  1. Open System Settings > Privacy & Security > Microphone");
+        eprintln!("  2. Find KeySpeak and toggle it ON");
+        eprintln!("  3. Quit and relaunch KeySpeak");
+        eprintln!("===========================================================");
+        eprintln!();
         all_ok = false;
     }
 

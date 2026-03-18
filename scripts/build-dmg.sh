@@ -21,6 +21,9 @@ sed -i '' "s/1\.0\.0/${VERSION}/g" "${APP_DIR}/Contents/Info.plist"
 ICON_SRC="../images/KeySpeak.icns"
 cp "${ICON_SRC}" "${APP_DIR}/Contents/Resources/AppIcon.icns"
 
+echo "▶ Self-signing app bundle..."
+codesign --force --deep --sign "KeySpeak Developer" "${APP_DIR}"
+
 echo "▶ Creating DMG..."
 hdiutil create \
   -volname "${APP}" \

@@ -40,8 +40,20 @@ enum AppMsg {
 }
 
 fn main() -> Result<()> {
+    // Redirect stderr to a log file so we can diagnose when launched from Finder
+    let log_path = dirs::data_local_dir()
+        .unwrap_or_else(|| std::path::PathBuf::from("."))
+        .join("keyspeak")
+        .join("keyspeak.log");
+    if let Ok(file) = std::fs::File::create(&log_path) {
+        use std::os::unix::io::IntoRawFd;
+        let fd = file.into_raw_fd();
+        unsafe { libc::dup2(fd, 2); }
+    }
+
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("warn")).init();
 
+    eprintln!("[main] KeySpeak starting, log: {}", log_path.display());
     permissions::ensure_permissions();
 
     let settings = Arc::new(Mutex::new(Settings::load()));
