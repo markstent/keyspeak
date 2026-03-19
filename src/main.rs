@@ -48,7 +48,9 @@ fn main() -> Result<()> {
     if let Ok(file) = std::fs::File::create(&log_path) {
         use std::os::unix::io::IntoRawFd;
         let fd = file.into_raw_fd();
-        unsafe { libc::dup2(fd, 2); }
+        unsafe {
+            libc::dup2(fd, 2);
+        }
     }
 
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("warn")).init();
@@ -98,11 +100,17 @@ fn main() -> Result<()> {
     let current_hotkey = Arc::new(Mutex::new(hotkey));
 
     // Global shortcuts for Settings and Quit
-    let settings_hotkey = HotKey::new(Some(Modifiers::CONTROL | Modifiers::ALT | Modifiers::SHIFT), Code::Comma);
+    let settings_hotkey = HotKey::new(
+        Some(Modifiers::CONTROL | Modifiers::ALT | Modifiers::SHIFT),
+        Code::Comma,
+    );
     let settings_hk_id = settings_hotkey.id();
     hk_manager.register(settings_hotkey)?;
 
-    let quit_hotkey = HotKey::new(Some(Modifiers::CONTROL | Modifiers::ALT | Modifiers::SHIFT), Code::KeyQ);
+    let quit_hotkey = HotKey::new(
+        Some(Modifiers::CONTROL | Modifiers::ALT | Modifiers::SHIFT),
+        Code::KeyQ,
+    );
     let quit_hk_id = quit_hotkey.id();
     hk_manager.register(quit_hotkey)?;
 

@@ -18,7 +18,7 @@ cp "target/release/keyspeak-settings" "${APP_DIR}/Contents/MacOS/keyspeak-settin
 cp "build/macos/Info.plist"    "${APP_DIR}/Contents/Info.plist"
 sed -i '' "s/1\.0\.0/${VERSION}/g" "${APP_DIR}/Contents/Info.plist"
 
-ICON_SRC="../images/KeySpeak.icns"
+ICON_SRC="assets/KeySpeak.icns"
 cp "${ICON_SRC}" "${APP_DIR}/Contents/Resources/AppIcon.icns"
 
 echo "▶ Self-signing app bundle..."
