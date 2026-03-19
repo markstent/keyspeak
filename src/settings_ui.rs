@@ -330,7 +330,7 @@ impl SettingsWindow {
                 ui.centered_and_justified(|ui| {
                     ui.label(
                         egui::RichText::new(
-                            "By using KeySpeak you agree to the terms at keyspeak.app/terms",
+                            "By using KeySpeak you agree to the terms at keyspeak.shop/terms",
                         )
                         .size(10.0)
                         .color(TEXT_TERTIARY),
