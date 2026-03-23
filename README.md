@@ -8,8 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![macOS](https://img.shields.io/badge/macOS-13%2B-black?logo=apple)](https://github.com/markstent/keyspeak/releases)
 
-[Website](https://keyspeak.shop) ·
-[Buy ready-made DMG — $5](https://keyspeak.shop/#pricing)
+[Website](https://keyspeak.shop)
 
 </div>
 
@@ -38,10 +37,7 @@ Your audio never leaves your machine.
 
 ## Installation
 
-**Option 1 — Buy the compiled app:** Get the ready-to-use DMG at
-[keyspeak.shop](https://keyspeak.shop/#pricing) ($5, one-time).
-
-**Option 2 — Build from source (free):**
+**Build from source:**
 ```bash
 # Install prerequisites
 brew install cmake
@@ -71,4 +67,3 @@ No telemetry, no analytics, no network requests.
 ## Licence
 
 MIT — see [LICENSE](LICENSE).
-Purchase a compiled release at [keyspeak.shop](https://keyspeak.shop).
