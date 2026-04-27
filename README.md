@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/keyspeak_logo.png" alt="KeySpeak" width="200">
+
 # KeySpeak
 
 **Local speech-to-text for macOS. Press a key, speak, text appears.**
