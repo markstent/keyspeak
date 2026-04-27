@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="KeySpeak - Local speech-to-text for macOS. Press a key, speak, text appears. Fully private, no internet required.">
+<title>KeySpeak - Local Speech-to-Text for macOS</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #050508; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    position: sticky;
+    top: 0;
+    background: rgba(5,5,8,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    z-index: 100;
+  }
+  .nav-logo { font-weight: 700; font-size: 15px; letter-spacing: -0.02em; color: #fff; text-decoration: none; }
+  .nav-cta {
+    background: #6c63ff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .nav-cta:hover { background: #7c73ff; }
+
+  .hero {
+    min-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -60%);
+    width: 600px;
+    height: 300px;
+    background: radial-gradient(ellipse, rgba(108,99,255,0.18), transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #6c63ff;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .hero-headline {
+    font-size: clamp(42px, 7vw, 80px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: #fff;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .hero-sub {
+    font-size: 17px;
+    color: #888;
+    max-width: 440px;
+    line-height: 1.6;
+    margin-bottom: 36px;
+    position: relative;
+  }
+  .waveform {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+    justify-content: center;
+    height: 40px;
+    margin-bottom: 36px;
+    position: relative;
+  }
+  .waveform span {
+    width: 3px;
+    border-radius: 2px;
+    background: #6c63ff;
+    animation: wave 1.4s ease-in-out infinite;
+  }
+  .waveform span:nth-child(1)  { height: 10px; animation-delay: 0s;    opacity: 0.35; }
+  .waveform span:nth-child(2)  { height: 20px; animation-delay: 0.1s;  opacity: 0.5; }
+  .waveform span:nth-child(3)  { height: 34px; animation-delay: 0.2s; }
+  .waveform span:nth-child(4)  { height: 26px; animation-delay: 0.3s;  opacity: 0.85; }
+  .waveform span:nth-child(5)  { height: 38px; animation-delay: 0.15s; }
+  .waveform span:nth-child(6)  { height: 22px; animation-delay: 0.25s; opacity: 0.7; }
+  .waveform span:nth-child(7)  { height: 32px; animation-delay: 0.05s; opacity: 0.9; }
+  .waveform span:nth-child(8)  { height: 14px; animation-delay: 0.35s; opacity: 0.45; }
+  .waveform span:nth-child(9)  { height: 24px; animation-delay: 0.4s;  opacity: 0.65; }
+  .waveform span:nth-child(10) { height: 8px;  animation-delay: 0s;    opacity: 0.3; }
+  @keyframes wave {
+    0%, 100% { transform: scaleY(1); }
+    50%       { transform: scaleY(0.45); }
+  }
+  .btn-primary {
+    display: inline-block;
+    background: #6c63ff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    padding: 14px 32px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .btn-primary:hover { background: #7c73ff; }
+  .hero-note { font-size: 12px; color: #555; position: relative; }
+
+  .trust-bar {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 18px 40px;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  .trust-item { font-size: 12px; color: #555; letter-spacing: 0.04em; text-transform: uppercase; }
+  .trust-item strong { color: #aaa; font-weight: 600; }
+
+  .features {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 100px 24px;
+  }
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6c63ff;
+    margin-bottom: 12px;
+  }
+  .section-heading {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: 48px;
+    max-width: 480px;
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  @media (max-width: 640px) {
+    .feature-grid { grid-template-columns: 1fr; }
+    nav { padding: 16px 20px; }
+    .trust-bar { gap: 16px; padding: 18px 20px; }
+    .features { padding: 60px 20px; }
+  }
+  .feature-card {
+    background: #0d0d14;
+    padding: 28px;
+    border: 1px solid #1a1a2a;
+  }
+  .feature-card:first-child { border-radius: 8px 0 0 0; }
+  .feature-card:nth-child(3) { border-radius: 0 8px 0 0; }
+  .feature-card:nth-child(4) { border-radius: 0 0 0 8px; }
+  .feature-card:last-child   { border-radius: 0 0 8px 0; }
+  .feature-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(108,99,255,0.15);
+    border-radius: 6px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .feature-icon svg { width: 16px; height: 16px; stroke: #6c63ff; fill: none; stroke-width: 1.8; }
+  .feature-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .feature-desc  { font-size: 13px; color: #666; line-height: 1.55; }
+
+  .how {
+    background: #07070d;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 100px 24px;
+    text-align: center;
+  }
+  .how-inner { max-width: 680px; margin: 0 auto; }
+  .steps {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-top: 48px;
+    position: relative;
+  }
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 15%;
+    right: 15%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #2a2a4a, #6c63ff, #2a2a4a, transparent);
+  }
+  .step { flex: 1; padding: 0 16px; }
+  .step-num {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: #0d0d14;
+    border: 1px solid #2a2a4a;
+    color: #6c63ff;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    position: relative;
+    z-index: 1;
+  }
+  .step-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .step-desc  { font-size: 12px; color: #555; line-height: 1.5; }
+
+  .privacy {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 100px 24px;
+    text-align: center;
+  }
+  .privacy-badge {
+    display: inline-block;
+    border: 1px solid #2a2a4a;
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 11px;
+    color: #6c63ff;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .privacy p { font-size: 15px; color: #666; line-height: 1.7; margin-bottom: 14px; }
+  .privacy p strong { color: #aaa; }
+
+  .footer-cta {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 80px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .footer-cta-glow {
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 500px; height: 200px;
+    background: radial-gradient(ellipse, rgba(108,99,255,0.12), transparent 70%);
+    pointer-events: none;
+  }
+  .footer-cta h2 {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+    color: #fff;
+    position: relative;
+  }
+  .footer-cta p { color: #666; font-size: 14px; margin-bottom: 28px; position: relative; }
+
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  footer span { font-size: 12px; color: #444; }
+  footer a { font-size: 12px; color: #555; text-decoration: none; margin-left: 20px; }
+  footer a:hover { color: #aaa; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">KeySpeak</a>
+  <a class="nav-cta" href="https://github.com/markstent/keyspeak/releases">Download</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-eyebrow">Local Speech-to-Text for macOS</div>
+  <h1 class="hero-headline">Press a key.<br>Speak. Done.</h1>
+  <p class="hero-sub">KeySpeak transcribes your voice and types it anywhere on your Mac. No internet. No API keys. No servers.</p>
+  <div class="waveform">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <a class="btn-primary" href="https://github.com/markstent/keyspeak/releases">Download for Mac - Free</a>
+  <span class="hero-note">macOS 13 or later required</span>
+</section>
+
+<div class="trust-bar">
+  <span class="trust-item"><strong>100% Local</strong> - No data leaves your Mac</span>
+  <span class="trust-item"><strong>Apple Silicon</strong> - Metal-accelerated</span>
+  <span class="trust-item"><strong>14 Languages</strong> - Powered by Whisper</span>
+  <span class="trust-item"><strong>Any App</strong> - Works system-wide</span>
+</div>
+
+<section class="features">
+  <div class="section-label">Features</div>
+  <h2 class="section-heading">Everything you need. Nothing you do not.</h2>
+  <div class="feature-grid">
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </div>
+      <div class="feature-title">Works Everywhere</div>
+      <div class="feature-desc">Any app that accepts text input. Slack, Notes, Terminal, email, browsers - press your hotkey and speak.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      </div>
+      <div class="feature-title">Fully Private</div>
+      <div class="feature-desc">All processing happens on your machine. No telemetry, no analytics, no network requests of any kind.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <div class="feature-title">Fast Transcription</div>
+      <div class="feature-desc">Apple Silicon Metal acceleration via whisper.cpp. Results appear in seconds, not minutes.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+      </div>
+      <div class="feature-title">14 Languages</div>
+      <div class="feature-desc">English, Spanish, French, German, Japanese, Chinese, and more - all processed offline.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      </div>
+      <div class="feature-title">Word Corrections</div>
+      <div class="feature-desc">Fix names, jargon, or words Whisper gets wrong. Your custom corrections applied automatically.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+      <div class="feature-title">Live Preview</div>
+      <div class="feature-desc">See your words appear as you speak. A menu bar waveform shows when recording is active.</div>
+    </div>
+
+  </div>
+</section>
+
+<section class="how">
+  <div class="how-inner">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-heading" style="max-width:100%;margin-bottom:0;font-size:32px;">Three steps, every time.</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">Press your hotkey</div>
+        <div class="step-desc">Any modifier and key combination. Recording starts instantly.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">Speak naturally</div>
+        <div class="step-desc">The waveform in your menu bar shows your voice is being captured.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Press again</div>
+        <div class="step-desc">Your words are typed at the cursor in whatever app is in focus.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="privacy">
+  <div class="privacy-badge">Privacy First</div>
+  <h2 class="section-heading" style="font-size:28px;max-width:100%;margin-bottom:20px;">Your voice never leaves your machine.</h2>
+  <p>KeySpeak uses <strong>Whisper</strong>, an open-source speech recognition model that runs entirely on-device. There is no cloud backend, no account, and no subscription.</p>
+  <p>The only permissions requested are <strong>Microphone</strong> (to capture audio) and <strong>Accessibility</strong> (to type text into other apps). Neither is used for anything else.</p>
+</section>
+
+<section class="footer-cta">
+  <div class="footer-cta-glow"></div>
+  <h2>Ready to speak your mind?</h2>
+  <p>Free and open source. macOS 13 or later.</p>
+  <a class="btn-primary" href="https://github.com/markstent/keyspeak/releases">Download for Mac - Free</a>
+</section>
+
+<footer>
+  <span>KeySpeak &copy; 2026</span>
+  <div>
+    <a href="https://github.com/markstent/keyspeak">GitHub</a>
+    <a href="PRIVACY.md">Privacy</a>
+    <a href="TERMS.md">Terms</a>
+  </div>
+</footer>
+
+</body>
+</html>
