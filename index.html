@@ -21,7 +21,8 @@
     border-bottom: 1px solid rgba(255,255,255,0.06);
     z-index: 100;
   }
-  .nav-logo { font-weight: 700; font-size: 15px; letter-spacing: -0.02em; color: #fff; text-decoration: none; }
+  .nav-logo { display: flex; align-items: center; text-decoration: none; }
+  .nav-logo img { height: 28px; width: auto; }
   .nav-cta {
     background: #6c63ff;
     color: #fff;
@@ -305,12 +306,13 @@
 <body>
 
 <nav>
-  <a class="nav-logo" href="/">KeySpeak</a>
+  <a class="nav-logo" href="/"><img src="assets/keyspeak_logo.png" alt="KeySpeak"></a>
   <a class="nav-cta" href="https://github.com/markstent/keyspeak/releases">Download</a>
 </nav>
 
 <section class="hero">
   <div class="hero-glow"></div>
+  <img src="assets/keyspeak_logo.png" alt="KeySpeak" style="height:72px;width:auto;margin-bottom:24px;position:relative;">
   <div class="hero-eyebrow">Local Speech-to-Text for macOS</div>
   <h1 class="hero-headline">Press a key.<br>Speak. Done.</h1>
   <p class="hero-sub">KeySpeak transcribes your voice and types it anywhere on your Mac. No internet. No API keys. No servers.</p>
