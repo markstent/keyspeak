@@ -33,7 +33,7 @@
     cursor: pointer;
     text-decoration: none;
   }
-  .nav-cta:hover { background: #7c73ff; }
+  .nav-cta:hover { background: #7c73ff; transition: background 0.15s ease; }
 
   .hero {
     min-height: 88vh;
@@ -125,6 +125,7 @@
     position: relative;
   }
   .btn-primary:hover { background: #7c73ff; }
+  .btn-primary, .nav-cta { transition: background 0.15s ease; }
   .hero-note { font-size: 12px; color: #555; position: relative; }
 
   .trust-bar {
@@ -166,9 +167,15 @@
   }
   @media (max-width: 640px) {
     .feature-grid { grid-template-columns: 1fr; }
+    .feature-card { border-radius: 0; }
+    .feature-card:first-child { border-radius: 8px 8px 0 0; }
+    .feature-card:last-child  { border-radius: 0 0 8px 8px; }
     nav { padding: 16px 20px; }
     .trust-bar { gap: 16px; padding: 18px 20px; }
     .features { padding: 60px 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .waveform span { animation: none; }
   }
   .feature-card {
     background: #0d0d14;
@@ -345,7 +352,7 @@
 
     <div class="feature-card">
       <div class="feature-icon">
-        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="none" stroke="#6c63ff" stroke-width="1.8" stroke-linejoin="round"/></svg>
       </div>
       <div class="feature-title">Fast Transcription</div>
       <div class="feature-desc">Apple Silicon Metal acceleration via whisper.cpp. Results appear in seconds, not minutes.</div>
